@@ -32,6 +32,12 @@ def pubsub_webhook(req):
     topic = f'projects/{topic_project}/topics/{topic_name}'
 
     data_raw = req.get_data()
+    pub_data = None
+    message_data = None
+    kwargs = None
+    message_type = None
+    origin = None
+    username = None
     try:
         data_json = json.loads(data_raw)
         message_data = data_json.get("data")
@@ -39,7 +45,7 @@ def pubsub_webhook(req):
         print("Message is not json, publishing raw")
 
     if message_data:
-        pub_data = json.dumps(message_data)
+        pub_data = json.dumps(message_data).encode("utf-8")
         attributes = data_json.get("attributes")
         if attributes:
             kwargs = attributes
@@ -51,7 +57,7 @@ def pubsub_webhook(req):
 
     # client.publish(topic, pub_data)
     client.publish(
-        topic, pub_data.encode("utf-8"), **kwargs
+        topic, pub_data, **kwargs
     )
 
     return f"ok {message_type} {origin} {username}"
