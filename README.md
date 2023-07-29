@@ -49,15 +49,20 @@ gcloud pubsub topics add-iam-policy-binding $TOPIC_NAME \
 ### Deploy
 
 ```bash
+GOOGLE_CLOUD_PROJECT=kencove-prod
+TOPIC_NAME=kencove_res_partner
+TOKEN=some_secret_for_auth
 gcloud beta functions deploy webhook \
      --source . \
      --runtime python37 \
      --entry-point pubsub_webhook \
      --service-account webhook@${GOOGLE_CLOUD_PROJECT}.iam.gserviceaccount.com \
-     --set-env-vars TOPIC_NAME=${TOPIC_NAME},TOPIC_PROJECT=${TOPIC_PROJECT},IP_WHITELIST=${IP_WHITELIST} \
+     --set-env-vars ^:^TOPIC_NAME=${TOPIC_NAME}:TOKENS=fake,${TOKEN} \
      --trigger-http \
      --allow-unauthenticated
 ```
+--dict-flag=^:^a=b,c:d=f,g
+
 
 ### Test
 
