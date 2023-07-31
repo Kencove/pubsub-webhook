@@ -21,7 +21,8 @@ def pubsub_webhook(req):
             return ('Forbidden', 403)
 
     if 'TOKENS' in os.environ:
-        if req.headers['x-token'] not in os.environ['TOKENS'].split(","):
+        if req.headers.get('x-token') not in (
+                os.environ.get('TOKENS') or "").split(","):
             return ('Unauthorized', 403)
 
     client = pubsub.PublisherClient()
@@ -34,7 +35,7 @@ def pubsub_webhook(req):
     data_raw = req.get_data()
     pub_data = None
     message_data = None
-    kwargs = None
+    kwargs = {}
     message_type = None
     origin = None
     username = None
@@ -49,9 +50,9 @@ def pubsub_webhook(req):
         attributes = data_json.get("attributes")
         if attributes:
             kwargs = attributes
-            message_type = data_json.get("type")
-            origin = data_json.get("origin")
-            username = data_json.get("username")
+            message_type = attributes.get("type")
+            origin = attributes.get("origin")
+            username = attributes.get("username")
     else:
         pub_data = data_raw
 
